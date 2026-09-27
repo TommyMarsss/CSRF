@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSRF 防护演示</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>CSRF 防护演示</h1>
+<p class="sub">双重提交 Cookie（会话绑定 token）+ Origin/Referer 校验 + SameSite=Lax，仅标准库后端 + 原生前端</p>
+
+<section class="panel">
+  <h2>① 正常表单（同源提交）</h2>
+  <form id="msg-form">
+    <label>昵称 <input name="name" value="ghost" required></label>
+    <label>留言 <input name="message" value="hello, csrf!" required></label>
+    <button type="submit">提交（同源 + 双重提交 token）</button>
+  </form>
+  <p class="hint">当前 token：<code id="token-view">加载中…</code></p>
+</section>
+
+<section class="panel">
+  <h2>② 模拟攻击</h2>
+  <div class="btns">
+    <button id="btn-rotate">轮换 token（领取新 token）</button>
+    <button id="btn-stale" class="atk">用已轮换的旧 token 提交</button>
+    <button id="btn-tamper" class="atk">篡改 Cookie 中的 token 后提交</button>
+    <button id="btn-fixation" class="atk">token 固定攻击（攻击者会话的 token）</button>
+    <button id="btn-notoken" class="atk">不带 token 提交</button>
+    <button id="btn-forged-origin" class="atk">伪造 Origin（说明 + curl）</button>
+    <button id="btn-evil" class="atk">打开跨站攻击页（__EVIL_ORIGIN__）</button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>③ 结果</h2>
+  <pre id="result">尚未提交</pre>
+</section>
+
+<section class="panel">
+  <h2>④ 服务端拦截日志（每 2 秒刷新）</h2>
+  <table id="log">
+    <thead><tr><th>时间</th><th>结果</th><th>来源</th><th>原因</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script>const EVIL_ORIGIN = "__EVIL_ORIGIN__";</script>
+<script src="/static/app.js"></script>
+</body>
+</html>
