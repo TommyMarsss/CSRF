@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSRF 防护演示</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>🛡️ CSRF 防护演示（双重提交 Cookie + Origin 校验 + SameSite）</h1>
+  <p id="session-info">会话初始化中…</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>留言表单（受保护）</h2>
+    <form id="guestbook">
+      <label>昵称 <input name="name" required maxlength="100" value="小明"></label>
+      <label>留言 <textarea name="message" required maxlength="1000">你好，世界！</textarea></label>
+      <button type="submit" class="ok">✅ 正常提交（同源 + 合法 token）</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>模拟攻击（真实触发，观察拦截原因）</h2>
+    <div class="attacks">
+      <button data-attack="stale-token" class="bad">① 复用旧 token<br><small>先轮换会话，再用旧 token 提交</small></button>
+      <button data-attack="token-fixation" class="bad">② Token 固定攻击<br><small>用攻击者会话的 token + 我的 Cookie</small></button>
+      <button data-attack="forged-origin" class="bad">③ 伪造 Origin<br><small>经攻击者服务器代理发送伪造 Origin</small></button>
+      <button data-attack="cross-site-form" class="bad">④ 跨站自动表单<br><small>iframe 加载攻击者页面自动 POST</small></button>
+      <button data-attack="no-origin" class="bad">⑤ 缺失 Origin<br><small>验证安全兜底：缺失即拒绝</small></button>
+    </div>
+    <p class="hint">攻击者站点：<a href="http://localhost:9000" target="_blank">http://localhost:9000</a>
+    （需运行 <code>python3 attacker_server.py</code>）。SameSite 边界对比演示也在该页面。</p>
+    <div id="iframe-slot"></div>
+  </section>
+
+  <section class="card">
+    <h2>请求日志</h2>
+    <div id="log"></div>
+  </section>
+
+  <section class="card">
+    <h2>已成功提交的留言（服务端数据）</h2>
+    <button id="refresh">刷新</button>
+    <ul id="submissions"></ul>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
